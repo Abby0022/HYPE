@@ -22,3 +22,7 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
+      - key: DEBUG
+        value: "False"
+      - key: ENV
+        value: "production"

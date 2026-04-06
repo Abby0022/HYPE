@@ -71,9 +71,13 @@ def get_supabase() -> Client:
 
 # App
 # ---------------------------------------------------------------------------
+_is_debug = os.getenv("DEBUG", "False").lower() == "true"
+
 app = FastAPI(
     title="The Hype Campaign Tracker API",
-    lifespan=lifespan
+    lifespan=lifespan,
+    docs_url="/docs" if _is_debug else None,
+    redoc_url="/redoc" if _is_debug else None,
 )
 
 # Filter out blank FRONTEND_URL before building allowed origins list
@@ -131,6 +135,7 @@ def normalize_campaign_status(status: Optional[str]) -> str:
 # Root
 # ---------------------------------------------------------------------------
 @app.get("/")
+@app.head("/")
 def read_root():
     return {"message": "Welcome to The Hype API. Systems are online."}
 
