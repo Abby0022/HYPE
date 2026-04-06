@@ -1,4 +1,4 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
 export async function proxy(request: NextRequest) {
@@ -12,19 +12,25 @@ export async function proxy(request: NextRequest) {
   const isHomePage = request.nextUrl.pathname === '/'
   
   if (!user && !isAuthPage && !isHomePage) {
-    // If user is not authenticated and trying to access a protected route
-    // Redirect them to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    return Response.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach(cookie => {
+      const { name, value, ...options } = cookie
+      redirectResponse.cookies.set(name, value, options)
+    })
+    return redirectResponse
   }
 
   if (user && isAuthPage) {
-    // If user is authenticated and trying to access an auth page
-    // Redirect them to the dashboard
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
-    return Response.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach(cookie => {
+      const { name, value, ...options } = cookie
+      redirectResponse.cookies.set(name, value, options)
+    })
+    return redirectResponse
   }
 
   return supabaseResponse

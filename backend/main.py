@@ -2,8 +2,9 @@ import os
 import asyncio
 import httpx
 from datetime import datetime, timezone
-from fastapi import FastAPI, UploadFile, File, BackgroundTasks, HTTPException, Depends, Form
+from fastapi import FastAPI, UploadFile, File, BackgroundTasks, HTTPException, Depends, Form, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from telegram import Update
 from pydantic import BaseModel
 from typing import Optional
 from contextlib import asynccontextmanager
@@ -30,14 +31,25 @@ async def _pinger():
             except Exception as e:
                 print(f"✗ Uptime Pinger: Failed to touch {url}: {e}")
 
+_bot_app = None
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    global _bot_app
     # Startup
-    bot_app = setup_bot()
-    await bot_app.initialize()
-    await bot_app.start()
-    await bot_app.updater.start_polling(drop_pending_updates=True)
-    print("✓ Telegram Bot Started")
+    _bot_app = setup_bot()
+    await _bot_app.initialize()
+    await _bot_app.start()
+
+    url = os.getenv("RENDER_EXTERNAL_URL")
+    if url:
+        webhook_url = f"{url}/telegram-webhook"
+        await _bot_app.bot.set_webhook(url=webhook_url, drop_pending_updates=True)
+        print(f"✓ Telegram Webhook Set to {webhook_url}")
+    else:
+        # Fallback to polling for local dev
+        await _bot_app.updater.start_polling(drop_pending_updates=True)
+        print("✓ Telegram Bot Polling Started")
     
     # Internal keep-alive for Render
     asyncio.create_task(_pinger())
@@ -45,30 +57,13 @@ async def lifespan(_app: FastAPI):
     yield
     
     # Shutdown
-    await bot_app.updater.stop()
-    await bot_app.stop()
-    await bot_app.shutdown()
+    if not url and _bot_app.updater:
+        await _bot_app.updater.stop()
+    await _bot_app.stop()
+    await _bot_app.shutdown()
     print("✓ Telegram Bot Stopped")
 
-
 # ---------------------------------------------------------------------------
-# Supabase singleton
-# ---------------------------------------------------------------------------
-_supabase_client: Client | None = None
-
-
-def get_supabase() -> Client:
-    global _supabase_client
-    if _supabase_client is None:
-        url = os.getenv("SUPABASE_URL", "")
-        key = os.getenv("SUPABASE_KEY", "")
-        if not url or not key:
-            # Raise RuntimeError so it's safe to call from background tasks too
-            raise RuntimeError("Missing Supabase configuration (SUPABASE_URL / SUPABASE_KEY)")
-        _supabase_client = create_client(url, key)
-    return _supabase_client
-
-
 # App
 # ---------------------------------------------------------------------------
 _is_debug = os.getenv("DEBUG", "False").lower() == "true"
@@ -98,6 +93,31 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ---------------------------------------------------------------------------
+# Telegram Webhook
+# ---------------------------------------------------------------------------
+@app.post("/telegram-webhook")
+async def telegram_webhook(request: Request):
+    global _bot_app
+    if not _bot_app:
+        return Response(status_code=500)
+    update_data = await request.json()
+    update = Update.de_json(update_data, _bot_app.bot)
+    await _bot_app.process_update(update)
+    return Response(status_code=200)
+
+_supabase_client: Client | None = None
+
+def get_supabase() -> Client:
+    global _supabase_client
+    if _supabase_client is None:
+        url = os.getenv("SUPABASE_URL", "")
+        key = os.getenv("SUPABASE_KEY", "")
+        if not url or not key:
+            raise RuntimeError("Missing Supabase configuration (SUPABASE_URL / SUPABASE_KEY)")
+        _supabase_client = create_client(url, key)
+    return _supabase_client
 
 
 # ---------------------------------------------------------------------------
