@@ -1,0 +1,151 @@
+
+> frontend@0.1.0 lint
+> eslint
+
+
+/Users/abby/Desktop/the-hype/frontend/src/app/(dashboard)/bank/page.tsx
+  5:77  warning  'Download' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/abby/Desktop/the-hype/frontend/src/app/(dashboard)/settlements/page.tsx
+  5:10  warning  'HandCoins' is defined but never used  @typescript-eslint/no-unused-vars
+  5:31  warning  'Upload' is defined but never used     @typescript-eslint/no-unused-vars
+
+/Users/abby/Desktop/the-hype/frontend/src/components/common/DataTable.tsx
+  10:20  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  10:30  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  15:9   error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  17:22  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  23:24  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  29:3   warning  'loading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/abby/Desktop/the-hype/frontend/src/components/common/LoadingState.tsx
+  11:58  warning  'height' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/abby/Desktop/the-hype/frontend/src/features/bank-credits/page.tsx
+  11:10  warning  'BankCredit' is defined but never used    @typescript-eslint/no-unused-vars
+  94:90  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/abby/Desktop/the-hype/frontend/src/features/campaigns/components/CampaignModal.tsx
+  13:17  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-explicit-any
+  63:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/abby/Desktop/the-hype/frontend/src/features/campaigns/components/CampaignModal.tsx:63:7
+  61 |   useEffect(() => {
+  62 |     if (isOpen && initialData && mode !== 'create') {
+> 63 |       setProductName(initialData.product_name || '')
+     |       ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  64 |       setOrderId(initialData.order_id || initialData.id?.slice(0, 8) || '')
+  65 |       setOrderDate(initialData.created_at ? new Date(initialData.created_at).toISOString().split('T')[0] : '')
+  66 |       setOrderValue(initialData.order_value ? initialData.order_value.toString() : '')  react-hooks/set-state-in-effect
+
+/Users/abby/Desktop/the-hype/frontend/src/features/campaigns/page.tsx
+   74:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/abby/Desktop/the-hype/frontend/src/features/campaigns/page.tsx:74:5
+  72 |     }
+  73 |
+> 74 |     updatePosition();
+     |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  75 |
+  76 |     const handleClickOutside = (event: MouseEvent) => {
+  77 |       const target = event.target as Node;  react-hooks/set-state-in-effect
+  187:37  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+  209:67  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+  218:40  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+  235:31  warning  'row' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+
+/Users/abby/Desktop/the-hype/frontend/src/features/dashboard/components/MetricsGrid.tsx
+  19:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/abby/Desktop/the-hype/frontend/src/features/dashboard/constants/index.ts
+  1:10  warning  'TrendingUp' is defined but never used    @typescript-eslint/no-unused-vars
+  1:22  warning  'TrendingDown' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/abby/Desktop/the-hype/frontend/src/features/dashboard/hooks/index.ts
+  30:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  50:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/abby/Desktop/the-hype/frontend/src/features/orders/components/OrderModal.tsx
+  10:21  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  12:17  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  66:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/abby/Desktop/the-hype/frontend/src/features/orders/components/OrderModal.tsx:66:7
+  64 |   useEffect(() => {
+  65 |     if (isOpen && initialData && mode !== 'create') {
+> 66 |       setOrderId(initialData.order_id || '')
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  67 |       setProductName(initialData.product_name || '')
+  68 |       setOrderDate(initialData.order_date
+  69 |         ? new Date(initialData.order_date).toISOString().split('T')[0]  react-hooks/set-state-in-effect
+
+/Users/abby/Desktop/the-hype/frontend/src/features/orders/page.tsx
+   46:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/abby/Desktop/the-hype/frontend/src/features/orders/page.tsx:46:5
+  44 |   useEffect(() => {
+  45 |     if (!open) return
+> 46 |     calcPos()
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  47 |     const onOut = (e: MouseEvent) => {
+  48 |       const t = e.target as Node
+  49 |       if (!menuRef.current?.contains(t) && !panelRef.current?.contains(t)) setOpen(false)  react-hooks/set-state-in-effect
+  114:42  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+  132:25  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+  199:90  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+
+/Users/abby/Desktop/the-hype/frontend/src/features/settlements/page.tsx
+  11:10  warning  'Settlement' is defined but never used    @typescript-eslint/no-unused-vars
+  74:90  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/abby/Desktop/the-hype/frontend/src/hooks/useExport.ts
+   9:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/abby/Desktop/the-hype/frontend/src/lib/exportUtils.ts
+    6:9   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   83:48  warning  'i' is defined but never used             @typescript-eslint/no-unused-vars
+  153:9   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  154:39  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  155:4   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  157:40  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/abby/Desktop/the-hype/frontend/src/utils/supabase/middleware.ts
+  18:48  warning  'options' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/abby/Desktop/the-hype/frontend/src/utils/supabase/server.ts
+   1:35  warning  'CookieOptions' is defined but never used  @typescript-eslint/no-unused-vars
+  20:20  warning  'error' is defined but never used          @typescript-eslint/no-unused-vars
+
+✖ 50 problems (36 errors, 14 warnings)
+
