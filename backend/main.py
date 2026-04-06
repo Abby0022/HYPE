@@ -36,7 +36,7 @@ async def lifespan(_app: FastAPI):
     bot_app = setup_bot()
     await bot_app.initialize()
     await bot_app.start()
-    await bot_app.updater.start_polling()
+    await bot_app.updater.start_polling(drop_pending_updates=True)
     print("✓ Telegram Bot Started")
     
     # Internal keep-alive for Render
@@ -144,7 +144,7 @@ def read_root():
 # Dashboard
 # ---------------------------------------------------------------------------
 @app.get("/dashboard-summary")
-def dashboard_summary():
+def dashboard_summary(user: dict = Depends(get_current_user)):  # FIXED: added auth guard
     sb = get_supabase()
 
     # ── defaults (all variables declared before any try/except block) ────────

@@ -2,14 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { fetchCampaigns, fetchBankCredits, fetchSettlements } from "@/lib/api";
+import { useAuth } from "@/hooks/useAuth";
 import { DashboardMetrics } from "../types";
 
 export function useDashboard() {
+  const { session, loading: authLoading } = useAuth();
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Only fetch once auth is confirmed — prevents 401 on page load/refresh
+    if (authLoading || !session) return;
+
     const fetchMetrics = async () => {
       try {
         setLoading(true);
@@ -90,7 +95,7 @@ export function useDashboard() {
     };
 
     fetchMetrics();
-  }, []);
+  }, [authLoading, session]);
 
   return {
     metrics,

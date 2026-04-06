@@ -2,9 +2,11 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { fetchCampaigns, createCampaign, deleteCampaign, api } from "@/lib/api";
+import { useAuth } from "@/hooks/useAuth";
 import { Campaign, CampaignStatus } from "../types";
 
 export function useCampaigns() {
+  const { session, loading: authLoading } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -76,9 +78,11 @@ export function useCampaigns() {
     }
   };
 
+  // Only fetch once auth is confirmed — prevents 401 on page load/refresh
   useEffect(() => {
+    if (authLoading || !session) return;
     load();
-  }, []);
+  }, [authLoading, session]);
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((c) => {

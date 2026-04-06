@@ -1,33 +1,46 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { fetchSettlements, markSettlementPaid } from "@/lib/api";
+import { useAuth } from "@/hooks/useAuth";
 import { Settlement } from "../types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
-
 export function useSettlements() {
+  const { session, loading: authLoading } = useAuth();
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "paid" | "failed">("all");
 
-  useEffect(() => {
-    const fetchSettlements = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${API_BASE}/settlements`);
-        setSettlements(response.data || []);
-      } catch (error) {
-        console.error("Failed to fetch settlements:", error);
-        setSettlements([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadSettlements = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchSettlements();
+      setSettlements(data || []);
+    } catch (error) {
+      console.error("Failed to fetch settlements:", error);
+      setSettlements([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchSettlements();
-  }, []);
+  // Only fetch once auth is confirmed — prevents 401 and uses authenticated api client
+  useEffect(() => {
+    if (authLoading || !session) return;
+    loadSettlements();
+  }, [authLoading, session]);
+
+  const markPaid = async (id: string) => {
+    try {
+      await markSettlementPaid(id);
+      await loadSettlements();
+      return true;
+    } catch (error) {
+      console.error("Failed to mark settlement as paid:", error);
+      return false;
+    }
+  };
 
   const filteredSettlements = settlements.filter((settlement) => {
     const matchesSearch =
@@ -49,5 +62,7 @@ export function useSettlements() {
     setSearch,
     statusFilter,
     setStatusFilter,
+    markPaid,
+    loadSettlements,
   };
 }
