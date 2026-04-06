@@ -1,4 +1,6 @@
 import os
+import asyncio
+import httpx
 from datetime import datetime, timezone
 from fastapi import FastAPI, UploadFile, File, BackgroundTasks, HTTPException, Depends, Form
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,9 +17,19 @@ from services.telegram_bot import setup_bot
 
 load_dotenv()
 
-# ---------------------------------------------------------------------------
-# Lifespan context manager for starting the Telegram bot
-# ---------------------------------------------------------------------------
+async def _pinger():
+    """Background task to keep the backend alive on Render's free tier."""
+    while True:
+        await asyncio.sleep(600) # Ping every 10 minutes
+        url = os.getenv("RENDER_EXTERNAL_URL")
+        if url:
+            try:
+                async with httpx.AsyncClient() as client:
+                    await client.get(url)
+                    print(f"✓ Uptime Pinger: Successfully touched {url}")
+            except Exception as e:
+                print(f"✗ Uptime Pinger: Failed to touch {url}: {e}")
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     # Startup
@@ -26,6 +38,9 @@ async def lifespan(_app: FastAPI):
     await bot_app.start()
     await bot_app.updater.start_polling()
     print("✓ Telegram Bot Started")
+    
+    # Internal keep-alive for Render
+    asyncio.create_task(_pinger())
     
     yield
     
@@ -63,12 +78,13 @@ app = FastAPI(
 
 # Filter out blank FRONTEND_URL before building allowed origins list
 _frontend_url = os.getenv("FRONTEND_URL", "").strip()
-_allowed_origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+_allowed_origins = []
+
 if _frontend_url:
     _allowed_origins.append(_frontend_url)
+else:
+    # Fallback to localhost if not set, for safety
+    _allowed_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
 app.add_middleware(
     CORSMiddleware,
