@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { fetchDashboardSummary } from '@/lib/api'
-import { useAuth } from '@/hooks/useAuth'
 import {
   RefreshCcw, TrendingUp, CreditCard, Activity,
   ArrowUpRight, Zap, CheckCircle2,
@@ -152,7 +151,6 @@ function StatCard({
 
 /* ── Main component ───────────────────────────────── */
 export default function SummaryPanel() {
-  const { session, loading: authLoading } = useAuth()
   const [data,        setData]        = useState<SummaryData | null>(null)
   const [loading,     setLoading]     = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
@@ -168,13 +166,11 @@ export default function SummaryPanel() {
     finally { setLoading(false); setRefreshing(false) }
   }
 
-  // Only fetch once auth is confirmed — prevents 401 on page load/refresh
   useEffect(() => {
-    if (authLoading || !session) return;
     loadData()
     const t = setInterval(() => loadData(), 30_000)
     return () => clearInterval(t)
-  }, [authLoading, session])
+  }, [])
 
   if (loading && !data) return <PanelSkeleton />
 

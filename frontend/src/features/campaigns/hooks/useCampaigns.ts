@@ -2,16 +2,13 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { fetchCampaigns, createCampaign, deleteCampaign, api } from "@/lib/api";
-import { useAuth } from "@/hooks/useAuth";
 import { Campaign, CampaignStatus } from "../types";
 
 export function useCampaigns() {
-  const { session, loading: authLoading } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  
-  // Filters
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<CampaignStatus>("all");
 
@@ -57,15 +54,15 @@ export function useCampaigns() {
   };
 
   const updateStatus = async (id: string, status: string) => {
-     try {
-       await api.patch(`/campaigns/${id}`, { status });
-       await load();
-       return true;
-     } catch (err) {
-       console.error("Failed to update status:", err);
-       return false;
-     }
-  }
+    try {
+      await api.patch(`/campaigns/${id}`, { status });
+      await load();
+      return true;
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      return false;
+    }
+  };
 
   const remove = async (id: string) => {
     try {
@@ -78,11 +75,9 @@ export function useCampaigns() {
     }
   };
 
-  // Only fetch once auth is confirmed — prevents 401 on page load/refresh
   useEffect(() => {
-    if (authLoading || !session) return;
     load();
-  }, [authLoading, session]);
+  }, []);
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((c) => {
@@ -105,6 +100,6 @@ export function useCampaigns() {
     search,
     setSearch,
     statusFilter,
-    setStatusFilter
+    setStatusFilter,
   };
 }

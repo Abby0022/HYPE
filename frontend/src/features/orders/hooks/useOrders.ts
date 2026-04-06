@@ -2,11 +2,9 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { deleteOrder, fetchOrders } from "@/lib/api";
-import { useAuth } from "@/hooks/useAuth";
 import { Order, OrderStatus } from "../types";
 
 export function useOrders() {
-  const { session, loading: authLoading } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -26,11 +24,9 @@ export function useOrders() {
     }
   }, []);
 
-  // Only fetch once auth is confirmed — prevents 401 on page load/refresh
   useEffect(() => {
-    if (authLoading || !session) return;
     loadOrders();
-  }, [authLoading, session, loadOrders]);
+  }, [loadOrders]);
 
   const filteredOrders = useMemo(() => {
     const searchValue = search.trim().toLowerCase();

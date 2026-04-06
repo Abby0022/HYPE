@@ -9,11 +9,11 @@ export const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// ── Request interceptor: attach the Supabase access token ──────────────────
 api.interceptors.request.use(async (config) => {
-  // Ensure this code doesn't break if unexpectedly run in SSR, 
-  // though typically api calls should happen CSR or be guarded.
   if (typeof window !== "undefined") {
     const supabase = createClient();
+    // getSession() reads from the cookie that middleware refreshed — reliable
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.access_token) {
       config.headers.Authorization = `Bearer ${session.access_token}`;
@@ -21,6 +21,23 @@ api.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+// ── Response interceptor: handle 401 globally ──────────────────────────────
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      error.response?.status === 401 &&
+      typeof window !== "undefined" &&
+      !window.location.pathname.startsWith("/login")
+    ) {
+      // Session expired or invalid — middleware will redirect on next navigation,
+      // but force it now so the user doesn't sit on a broken page.
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 // ---------------------------------------------------------------------------
 // Dashboard

@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { fetchSettlements, markSettlementPaid } from "@/lib/api";
-import { useAuth } from "@/hooks/useAuth";
 import { Settlement } from "../types";
 
 export function useSettlements() {
-  const { session, loading: authLoading } = useAuth();
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -25,11 +23,9 @@ export function useSettlements() {
     }
   };
 
-  // Only fetch once auth is confirmed — prevents 401 and uses authenticated api client
   useEffect(() => {
-    if (authLoading || !session) return;
     loadSettlements();
-  }, [authLoading, session]);
+  }, []);
 
   const markPaid = async (id: string) => {
     try {

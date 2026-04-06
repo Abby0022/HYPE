@@ -144,7 +144,7 @@ def read_root():
 # Dashboard
 # ---------------------------------------------------------------------------
 @app.get("/dashboard-summary")
-def dashboard_summary(user: dict = Depends(get_current_user)):  # FIXED: added auth guard
+def dashboard_summary():
     sb = get_supabase()
 
     # ── defaults (all variables declared before any try/except block) ────────
